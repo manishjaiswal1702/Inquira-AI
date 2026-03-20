@@ -6,8 +6,23 @@ const api = axios.create({
 })
 
 
-export const sendMessage = async ({ message, chatId }) => {
-    const response = await api.post("/api/chats/message", { message, chat: chatId })
+export const sendMessage = async ({ message, chatId, files = [] }) => {
+    const formData = new FormData()
+    formData.append("message", message)
+    if (chatId) {
+        formData.append("chat", chatId)
+    }
+    
+    // Add files if provided
+    files.forEach((file) => {
+        formData.append("files", file)
+    })
+
+    const response = await api.post("/api/chats/message", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data"
+        }
+    })
     return response.data
 }
 

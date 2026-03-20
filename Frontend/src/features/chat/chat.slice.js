@@ -20,11 +20,23 @@ const chatSlice = createSlice({
                     messages: [],
                     lastUpdated: new Date().toISOString(),
                 }
+            } else {
+                state.chats[chatId].lastUpdated = new Date().toISOString()
             }
         },
         addNewMessage: (state, action) => {
             const { chatId, content, role } = action.payload
+            if (!state.chats[chatId]) return
             state.chats[chatId].messages.push({ content, role })
+            state.chats[chatId].lastUpdated = new Date().toISOString()
+        },
+        updateLastMessage: (state, action) => {
+            const { chatId, content, role } = action.payload
+            if (state.chats[chatId]?.messages?.length > 0) {
+                const lastIndex = state.chats[chatId].messages.length - 1
+                state.chats[chatId].messages[lastIndex] = { content, role }
+                state.chats[chatId].lastUpdated = new Date().toISOString()
+            }
         },
         addMessages: (state, action) => {
             const { chatId, messages } = action.payload
@@ -35,6 +47,10 @@ const chatSlice = createSlice({
         },
         setCurrentChatId: (state, action) => {
             state.currentChatId = action.payload
+            // Clear temporary chat when switching to a new chat
+            if (state.chats[null] && action.payload !== null) {
+                delete state.chats[null]
+            }
         },
         setLoading: (state, action) => {
             state.isLoading = action.payload
@@ -45,7 +61,7 @@ const chatSlice = createSlice({
     }
 })
 
-export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, addMessages } = chatSlice.actions
+export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, updateLastMessage, addMessages } = chatSlice.actions
 export default chatSlice.reducer
 
 

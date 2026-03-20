@@ -4,23 +4,23 @@ import { useAuth } from '../hook/useAuth'
 import { useNavigate } from 'react-router'
 import { useSelector } from 'react-redux'
 import { Navigate } from 'react-router'
+import { CheckCircle, Mail } from 'lucide-react'
 
 
 const Register = () => {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
 
   const { handleRegister } = useAuth()
   const navigate = useNavigate()
 
   const loading = useSelector(state => state.auth.loading)
-  const user = useSelector(state => state.auth.user)
-  if (loading) {
-    return <div>Loading...</div>
-  }
-  if (user) {
-    return <Navigate to="/" replace />
+  const error = useSelector(state => state.auth.error)
+  
+  if (loading && !registrationSuccess) {
+    return <div className="min-h-screen bg-[#0f0f1e] text-white flex items-center justify-center">Loading...</div>
   }
 
   const submitForm = async (event) => {
@@ -32,26 +32,81 @@ const Register = () => {
       password,
     }
     await handleRegister(payload)
-    navigate('/')
-    setUsername('')
-    setEmail('')
-    setPassword('')
+    setRegistrationSuccess(true)
+  }
+
+  // Show verification pending screen
+  if (registrationSuccess) {
+    return (
+      <section className="min-h-screen bg-[#0f0f1e] px-4 py-10 text-white sm:px-6 lg:px-8 flex items-center justify-center">
+        <div className="w-full max-w-md">
+          <div className="rounded-2xl border border-white/10 bg-[#1a1a2e] p-8 backdrop-blur text-center">
+            <div className='w-16 h-16 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-3xl mx-auto mb-6'>
+              <CheckCircle size={32} />
+            </div>
+            
+            <h2 className="text-2xl font-bold text-white mb-2">Registration Successful!</h2>
+            <p className="text-white/70 mb-4">
+              We've sent a verification email to <strong>{email}</strong>
+            </p>
+
+            <div className="bg-orange-500/10 border border-orange-500/30 rounded-lg p-4 mb-6">
+              <div className='flex items-start gap-3'>
+                <Mail size={20} className='text-orange-400 flex-shrink-0 mt-1' />
+                <div className='text-left'>
+                  <p className="text-sm text-white/90 font-medium">Check your email</p>
+                  <p className="text-xs text-white/60 mt-1">
+                    Click the verification link to activate your account. The link expires in 24 hours.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-white/60 text-sm mb-6">
+              Once verified, you can log in with your credentials.
+            </p>
+
+            <Link 
+              to="/login"
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-4 rounded-lg transition inline-block"
+            >
+              Go to Login
+            </Link>
+
+            <p className="text-white/60 text-sm mt-4">
+              Didn't receive the email? Check your spam folder.
+            </p>
+          </div>
+        </div>
+      </section>
+    )
   }
 
   return (
-    <section className="min-h-screen bg-zinc-950 px-4 py-10 text-zinc-100 sm:px-6 lg:px-8">
-      <div className="mx-auto flex min-h-[85vh] w-full max-w-5xl items-center justify-center">
-        <div className="w-full max-w-md rounded-2xl border border-[#31b8c6]/40 bg-zinc-900/70 p-8 shadow-2xl shadow-black/50 backdrop-blur">
-          <h1 className="text-3xl font-bold text-[#31b8c6]">
-            Create Account
-          </h1>
-          <p className="mt-2 text-sm text-zinc-300">
-            Register with your username, email, and password.
-          </p>
+    <section className="min-h-screen bg-[#0f0f1e] px-4 py-10 text-white sm:px-6 lg:px-8 flex items-center justify-center">
+      <div className="w-full max-w-md">
+        {/* Logo/Brand Section */}
+        <div className="mb-8 text-center">
+          <div className='w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-2xl mx-auto'>
+            ◉
+          </div>
+          <h1 className="mt-4 text-4xl font-bold">Inquira AI</h1>
+          <p className="mt-2 text-white/60">Create your account</p>
+        </div>
 
-          <form onSubmit={submitForm} className="mt-8 space-y-5">
+        {/* Register Card */}
+        <div className="rounded-2xl border border-white/10 bg-[#1a1a2e] p-8 backdrop-blur">
+          <h2 className="text-2xl font-bold text-white mb-6">Get Started</h2>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+              <p className="text-red-400 text-sm">{error}</p>
+            </div>
+          )}
+
+          <form onSubmit={submitForm} className="space-y-5">
             <div>
-              <label htmlFor="username" className="mb-2 block text-sm font-medium text-zinc-200">
+              <label htmlFor="username" className="mb-2 block text-sm font-medium text-white/90">
                 Username
               </label>
               <input
@@ -61,13 +116,13 @@ const Register = () => {
                 onChange={(event) => setUsername(event.target.value)}
                 placeholder="Choose a username"
                 required
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-4 py-3 text-zinc-100 outline-none ring-0 transition focus:border-[#31b8c6] focus:shadow-[0_0_0_3px_rgba(49,184,198,0.25)]"
+                className="w-full rounded-lg border border-white/20 bg-[#0f0f1e] px-4 py-3 text-white outline-none transition placeholder:text-white/40 focus:border-orange-500/50 focus:bg-[#242438]"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="mb-2 block text-sm font-medium text-zinc-200">
-                Email
+              <label htmlFor="email" className="mb-2 block text-sm font-medium text-white/90">
+                Email Address
               </label>
               <input
                 id="email"
@@ -76,12 +131,12 @@ const Register = () => {
                 onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-4 py-3 text-zinc-100 outline-none ring-0 transition focus:border-[#31b8c6] focus:shadow-[0_0_0_3px_rgba(49,184,198,0.25)]"
+                className="w-full rounded-lg border border-white/20 bg-[#0f0f1e] px-4 py-3 text-white outline-none transition placeholder:text-white/40 focus:border-orange-500/50 focus:bg-[#242438]"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="mb-2 block text-sm font-medium text-zinc-200">
+              <label htmlFor="password" className="mb-2 block text-sm font-medium text-white/90">
                 Password
               </label>
               <input
@@ -89,26 +144,27 @@ const Register = () => {
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                placeholder="Create a password"
+                placeholder="Create a strong password"
                 required
-                className="w-full rounded-lg border border-zinc-700 bg-zinc-950/80 px-4 py-3 text-zinc-100 outline-none ring-0 transition focus:border-[#31b8c6] focus:shadow-[0_0_0_3px_rgba(49,184,198,0.25)]"
+                className="w-full rounded-lg border border-white/20 bg-[#0f0f1e] px-4 py-3 text-white outline-none transition placeholder:text-white/40 focus:border-orange-500/50 focus:bg-[#242438]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full rounded-lg bg-[#31b8c6] px-4 py-3 font-semibold text-zinc-950 transition hover:bg-[#45c7d4] focus:outline-none focus:shadow-[0_0_0_3px_rgba(49,184,198,0.35)]"
+              disabled={loading}
+              className="w-full rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 transition disabled:bg-orange-500/50 disabled:cursor-not-allowed"
             >
-              Register
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-zinc-300">
+          <div className="mt-6 text-center text-sm text-white/60">
             Already have an account?{' '}
-            <Link to="/login" className="font-semibold text-[#31b8c6] transition hover:text-[#45c7d4]">
-              Login
+            <Link to="/login" className="font-semibold text-orange-400 hover:text-orange-300 transition">
+              Sign in
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     </section>
