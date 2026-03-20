@@ -217,7 +217,7 @@ const Dashboard = () => {
           <div className='flex-1 flex flex-col items-center justify-center px-4 py-8'>
             {/* Logo */}
             <div className='mb-8'>
-              <div className='w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-2xl'>
+              <div className='w-16 h-16 rounded-2xl bg-linear-to-br from-orange-400 to-orange-600 flex items-center justify-center text-2xl'>
                 ◉
               </div>
             </div>
@@ -283,7 +283,7 @@ const Dashboard = () => {
                 </div>
 
                 {/* Toolbar buttons */}
-                <div className='absolute right-2 bottom-[10px] flex items-center gap-2'>
+                <div className='absolute right-2 bottom-2.5 flex items-center gap-2'>
                   <button
                     type='submit'
                     disabled={!chatInput.trim() && attachedFiles.length === 0}
@@ -364,7 +364,7 @@ const Dashboard = () => {
             </div>
 
             {/* Input Footer */}
-            <div className='fixed bottom-0 left-0 md:left-64 right-0 z-50 border-t border-white/10 bg-gradient-to-t from-[#0f0f1e] to-[#0f0f1e]/80 px-6 py-4'>
+            <div className='fixed bottom-0 left-0 md:left-64 right-0 z-50 border-t border-white/10 bg-linear-to-t from-[#0f0f1e] to-[#0f0f1e]/80 px-6 py-4'>
               <form onSubmit={handleSubmitMessage} className='max-w-3xl mx-auto'>
                 {/* Attached Files Display */}
                 {attachedFiles.length > 0 && (
@@ -398,7 +398,7 @@ const Dashboard = () => {
                       accept='*/*'
                     />
 
-                    <div className='absolute left-2 bottom-[10px] flex items-center gap-2'>
+                    <div className='absolute left-2 bottom-2.5 flex items-center gap-2'>
                       <button
                         type='button'
                         onClick={() => fileInputRef.current?.click()}
@@ -425,7 +425,7 @@ const Dashboard = () => {
                   </div>
 
                   {/* Right Side Buttons (inside input like top) */}
-                  <div className='absolute right-2 bottom-[10px] flex items-center gap-2'>
+                  <div className='absolute right-2 bottom-2.5 flex items-center gap-2'>
 
                     <button
                       type='submit'
