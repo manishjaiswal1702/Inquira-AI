@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useSelector } from 'react-redux'
 import { useChat } from '../hooks/useChat'
 import { useAuth } from '../../../features/auth/hook/useAuth'
 import { useNavigate } from 'react-router'
 import remarkGfm from 'remark-gfm'
-import { Plus, Home, Zap, Compass, BookOpen, History, MessageSquare, Search, Lightbulb, Paperclip, LogOut } from 'lucide-react'
+import { Plus, Home, Zap, Compass, BookOpen, History, MessageSquare, Lightbulb, Paperclip, LogOut } from 'lucide-react'
 
 
 const Dashboard = () => {
@@ -136,11 +136,17 @@ const Dashboard = () => {
           {/* New Chat Button */}
           <button
             onClick={handleNewChat}
-            className='w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition'
+            className='group w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 px-4 rounded-xl flex items-center gap-3 transition-all duration-200 shadow-md shadow-orange-500/20 hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-[0.98]'
           >
-            <Plus size={18} />
-            New Chat
-            <span className='text-xs ml-auto'>N</span>
+            <div className='flex items-center justify-center w-8 h-8 rounded-lg bg-white/10 group-hover:bg-white/15 transition'>
+              <Plus size={18} />
+            </div>
+
+            <span className='text-sm'>New Chat</span>
+
+            <span className='ml-auto text-[11px] px-2 py-0.5 rounded-md bg-white/10 text-white/80 group-hover:bg-white/15 transition'>
+              N
+            </span>
           </button>
         </div>
 
