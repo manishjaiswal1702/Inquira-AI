@@ -92,7 +92,7 @@ export const useChat = () => {
             }))
             dispatch(addNewMessage({
                 chatId,
-                content: "",
+                content: "Thinking...",
                 role: "ai",
             }))
 
