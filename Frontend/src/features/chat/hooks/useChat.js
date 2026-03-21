@@ -1,13 +1,14 @@
 import { initializeSocketConnection } from "../service/chat.socket";
-import { sendMessage, getChats, getMessages} from "../service/chat.api";
+import { sendMessage, getChats, getMessages } from "../service/chat.api";
 import { setChats, setCurrentChatId, setError, setLoading, createNewChat, addNewMessage, updateLastMessage, addMessages } from "../chat.slice";
 import { useDispatch } from "react-redux";
+import { appendToLastMessage, replaceTempChat } from "../chat.slice";
+
 
 
 export const useChat = () => {
 
     const dispatch = useDispatch()
-
 
     async function handleSendMessage({ message, chatId, files = [] }) {
         try {
@@ -16,40 +17,70 @@ export const useChat = () => {
             // For new chats, don't show optimistic updates until server responds
             // This prevents temporary messages from appearing before chat creation
             if (!chatId) {
-                // Send to server first to create chat
-                const data = await sendMessage({ message, chatId, files })
-                const { chat, aiMessage } = data
+                // 1️⃣ temporary chat id (UI ke liye)
+                const tempChatId = "temp-" + Date.now()
 
-                // Create new chat in Redux and set current chat immediately
+                // 2️⃣ UI instantly show karo (IMPORTANT)
                 dispatch(createNewChat({
-                    chatId: chat._id,
-                    title: chat.title,
+                    chatId: tempChatId,
+                    title: "New Chat",
                 }))
-                dispatch(setCurrentChatId(chat._id))
+                dispatch(setCurrentChatId(tempChatId))
 
-                // Show user message and temporary AI typing indicator first
                 dispatch(addNewMessage({
-                    chatId: chat._id,
+                    chatId: tempChatId,
                     content: message,
                     role: "user",
                 }))
+
                 dispatch(addNewMessage({
-                    chatId: chat._id,
+                    chatId: tempChatId,
                     content: "Thinking...",
                     role: "ai",
                 }))
 
-                dispatch(setLoading(false))
 
-                // Replace thinking placeholder with final AI response
-                setTimeout(() => {
-                    dispatch(updateLastMessage({
-                        chatId: chat._id,
-                        content: aiMessage.content,
-                        role: aiMessage.role,
+                try {
+                    // 3️⃣ server call AFTER UI update
+                    const data = await sendMessage({ message, chatId, files })
+                    const { chat, aiMessage } = data
+
+                    // 4️⃣ replace temp chatId with real chatId
+                    dispatch(setCurrentChatId(chat._id))
+
+                    dispatch(replaceTempChat({
+                        tempChatId,
+                        newChat: chat
                     }))
-                }, 400)
 
+                    dispatch(setCurrentChatId(chat._id))
+
+
+
+                    const fullText = aiMessage.content
+                    let index = 0
+
+                    const interval = setInterval(() => {
+                        if (index < fullText.length) {
+                            dispatch(appendToLastMessage({
+                                chatId: chat._id,
+                                content: fullText[index],
+                            }))
+                            index++
+                        } else {
+                            clearInterval(interval)
+                        }
+                    }, 5)
+
+                } catch (error) {
+                    dispatch(updateLastMessage({
+                        chatId: tempChatId,
+                        content: "Something went wrong",
+                        role: "ai",
+                    }))
+                }
+
+                dispatch(setLoading(false))
                 return
             }
 
@@ -61,7 +92,7 @@ export const useChat = () => {
             }))
             dispatch(addNewMessage({
                 chatId,
-                content: "Thinking...",
+                content: "",
                 role: "ai",
             }))
 
@@ -70,11 +101,19 @@ export const useChat = () => {
             const { aiMessage } = data
 
             // Update the thinking message with actual AI response
-            dispatch(updateLastMessage({
-                chatId,
-                content: aiMessage.content,
-                role: aiMessage.role,
-            }))
+            const fulltext = aiMessage.content
+            let index = 0
+            const interval = setInterval(() => {
+                if (index < fulltext.length) {
+                    dispatch(appendToLastMessage({
+                        chatId,
+                        content: fulltext[index],
+                    }))
+                    index++
+                } else {
+                    clearInterval(interval)
+                }
+            }, 5)
 
             dispatch(setLoading(false))
         } catch (error) {

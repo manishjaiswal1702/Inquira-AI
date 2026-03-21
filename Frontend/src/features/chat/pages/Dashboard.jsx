@@ -20,6 +20,7 @@ const Dashboard = () => {
   const fileInputRef = useRef(null)
   const [attachedFiles, setAttachedFiles] = useState([])
   const textareaRef = useRef(null)
+  const bottomRef = useRef(null)
 
   // Get user initials for avatar
   const getInitials = (username) => {
@@ -100,6 +101,12 @@ const Dashboard = () => {
       handleSubmitMessage(event)
     }
   }
+
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [chats[currentChatId]?.messages?.length])
 
 
   const quickActions = [
@@ -196,9 +203,9 @@ const Dashboard = () => {
         </div>
 
         {/* User Profile & Logout */}
-        <div className='border-t border-white/10 pt-4 space-y-2'>
+        <div className='border-t border-white/10 pt-4 space-y-2 overflow-hidden'>
           <button className='w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition'>
-            <div className='w-8 h-8 rounded-full bg-orange-500/50 flex items-center justify-center text-sm font-semibold'>
+            <div className='w-9 aspect-square rounded-full bg-orange-500 text-white flex items-center justify-center text-sm font-semibold shrink-0'>
               {getInitials(user?.username || 'User')}
             </div>
             <div className='flex-1 text-left'>
@@ -367,6 +374,7 @@ const Dashboard = () => {
                   </div>
                 </div>
               ))}
+              <div ref={bottomRef} />
             </div>
 
             {/* Input Footer */}

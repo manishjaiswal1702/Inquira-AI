@@ -58,10 +58,35 @@ const chatSlice = createSlice({
         setError: (state, action) => {
             state.error = action.payload
         },
+        appendToLastMessage: (state, action) => {
+            const { chatId, content } = action.payload
+            const messages = state.chats[chatId]?.messages
+            if (!messages || messages.length === 0) return
+
+            const lastMessage = messages[messages.length - 1]
+            lastMessage.content += content
+        },
+        replaceTempChat: (state, action) => {
+            const { tempChatId, newChat } = action.payload
+
+            // temp chat ke messages le lo
+            const tempMessages = state.chats[tempChatId]?.messages || []
+
+            // temp chat delete karo
+            delete state.chats[tempChatId]
+
+            // new chat add karo with same messages
+            state.chats[newChat._id] = {
+                id: newChat._id,
+                title: newChat.title,
+                messages: tempMessages,
+                lastUpdated: new Date().toISOString(),
+            }
+        },
     }
 })
 
-export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, updateLastMessage, addMessages } = chatSlice.actions
+export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, updateLastMessage, addMessages, appendToLastMessage, replaceTempChat } = chatSlice.actions
 export default chatSlice.reducer
 
 
