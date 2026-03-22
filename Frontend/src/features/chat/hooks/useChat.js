@@ -55,7 +55,11 @@ export const useChat = () => {
 
                     dispatch(setCurrentChatId(chat._id))
 
-
+                    dispatch(updateLastMessage({
+                        chatId: chat._id,
+                        content: "",
+                        role: "ai",
+                    }))
 
                     const fullText = aiMessage.content
                     let index = 0
@@ -100,6 +104,14 @@ export const useChat = () => {
             const data = await sendMessage({ message, chatId, files })
             const { aiMessage } = data
 
+            setTimeout(() => {
+
+            dispatch(updateLastMessage({
+                chatId,
+                content: "",
+                role: "ai",
+            }))
+
             // Update the thinking message with actual AI response
             const fulltext = aiMessage.content
             let index = 0
@@ -114,6 +126,8 @@ export const useChat = () => {
                     clearInterval(interval)
                 }
             }, 5)
+
+            }, 300) // Simulate thinking delay
 
             dispatch(setLoading(false))
         } catch (error) {
