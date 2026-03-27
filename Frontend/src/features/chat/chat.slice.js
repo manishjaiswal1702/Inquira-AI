@@ -83,10 +83,18 @@ const chatSlice = createSlice({
                 lastUpdated: new Date().toISOString(),
             }
         },
+        deleteChat: (state, action) => {
+            const { chatId } = action.payload
+            delete state.chats[chatId]
+            // If the deleted chat was the current chat, reset currentChatId
+            if (state.currentChatId === chatId) {
+                state.currentChatId = null
+            }
+        },
     }
 })
 
-export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, updateLastMessage, addMessages, appendToLastMessage, replaceTempChat } = chatSlice.actions
+export const { setChats, setCurrentChatId, setLoading, setError, createNewChat, addNewMessage, updateLastMessage, addMessages, appendToLastMessage, replaceTempChat, deleteChat } = chatSlice.actions
 export default chatSlice.reducer
 
 

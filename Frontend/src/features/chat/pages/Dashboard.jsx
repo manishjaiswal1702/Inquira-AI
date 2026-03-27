@@ -5,11 +5,11 @@ import { useChat } from '../hooks/useChat'
 import { useAuth } from '../../../features/auth/hook/useAuth'
 import { useNavigate } from 'react-router'
 import remarkGfm from 'remark-gfm'
-import { Plus, Home, Zap, Compass, BookOpen, History, MessageSquare, Lightbulb, Paperclip, LogOut } from 'lucide-react'
+import { Plus, Home, Zap, Compass, BookOpen, History, MessageSquare, Lightbulb, Paperclip, LogOut, Trash2 } from 'lucide-react'
 
 
 const Dashboard = () => {
-  const chat = useChat()
+  const { initializeSocketConnection, handleSendMessage, handleGetChats, handleOpenChat, handleNewChat: newChatHandler, handleDeleteChat } = useChat()
   const { handleLogout } = useAuth()
   const navigate = useNavigate()
   const [chatInput, setChatInput] = useState('')
@@ -39,8 +39,8 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    chat.initializeSocketConnection()
-    chat.handleGetChats()
+    initializeSocketConnection()
+    handleGetChats()
   }, [])
 
   useEffect(() => {
@@ -64,7 +64,7 @@ const Dashboard = () => {
       return
     }
 
-    chat.handleSendMessage({
+    handleSendMessage({
       message: trimmedMessage,
       chatId: currentChatId,
       files: attachedFiles
@@ -78,11 +78,11 @@ const Dashboard = () => {
   }
 
   const openChat = (chatId) => {
-    chat.handleOpenChat(chatId, chats)
+    handleOpenChat(chatId, chats)
   }
 
   const handleNewChat = () => {
-    chat.handleNewChat()
+    newChatHandler()
     setChatInput('')
     setAttachedFiles([])
   }
@@ -190,14 +190,28 @@ const Dashboard = () => {
             {Object.values(chats)
               .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
               .map((chat) => (
-                <button
-                  onClick={() => openChat(chat.id)}
+                <div
                   key={chat.id}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm truncate transition ${chat.id === currentChatId ? 'text-white bg-white/10' : 'text-white/70 hover:text-white hover:bg-white/5'
+                  className={`group flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition ${chat.id === currentChatId ? 'text-white bg-white/10' : 'text-white/70 hover:text-white hover:bg-white/5'
                     }`}
                 >
-                  {chat.title}
-                </button>
+                  <button
+                    onClick={() => openChat(chat.id)}
+                    className='flex-1 text-left truncate'
+                  >
+                    {chat.title}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDeleteChat(chat.id)
+                    }}
+                    className='opacity-0 group-hover:opacity-100 p-1 hover:bg-white/10 rounded transition-opacity'
+                    title='Delete chat'
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               ))}
           </div>
         </div>
