@@ -5,7 +5,7 @@ import { useChat } from '../hooks/useChat'
 import { useAuth } from '../../../features/auth/hook/useAuth'
 import { useNavigate } from 'react-router'
 import remarkGfm from 'remark-gfm'
-import { Plus, Home, Zap, Compass, BookOpen, History, MessageSquare, Lightbulb, Paperclip, LogOut, Trash2 } from 'lucide-react'
+import { Plus, Home, Zap, Compass, BookOpen, History, MessageSquare, Lightbulb, Paperclip, LogOut, Trash2, Menu, ChevronLeft, ChevronRight } from 'lucide-react'
 
 
 const Dashboard = () => {
@@ -17,6 +17,7 @@ const Dashboard = () => {
   const currentChatId = useSelector((state) => state.chat.currentChatId)
   const user = useSelector((state) => state.auth.user)
   const [showGreeting, setShowGreeting] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const fileInputRef = useRef(null)
   const [attachedFiles, setAttachedFiles] = useState([])
   const textareaRef = useRef(null)
@@ -129,8 +130,19 @@ const Dashboard = () => {
 
   return (
     <main className='min-h-screen w-full bg-[#0f0f1e] text-white flex'>
+      <button
+        onClick={() => setIsSidebarOpen((prev) => !prev)}
+        className='fixed top-4 z-60 bg-[#1a1a2e] border border-white/20 text-white p-2 rounded-lg shadow-lg hover:bg-[#242438] transition-all duration-300 ease-in-out flex items-center justify-center'
+        style={{ minWidth: '42px', left: isSidebarOpen ? '17rem' : '1rem' }}
+        aria-label={isSidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+      >
+        {isSidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+      </button>
       {/* Sidebar - Fixed */}
-      <aside className='hidden md:flex md:fixed md:left-0 md:top-0 md:h-screen w-64 bg-[#1a1a2e] border-r border-white/10 flex-col p-4 z-50'>
+      <aside
+        className={`fixed top-0 left-0 h-screen bg-[#1a1a2e] border-r border-white/10 flex flex-col p-4 z-50 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-64 translate-x-0 opacity-100' : 'w-0 -translate-x-full opacity-0'}`}
+        aria-hidden={!isSidebarOpen}
+      >
         {/* Logo/Brand */}
         <div className='mb-8'>
           <div className='flex items-center gap-2 mb-6'>
@@ -185,7 +197,7 @@ const Dashboard = () => {
           }}
         >
           <style>{` .no-scrollbar::-webkit-scrollbar { display: none; } `}</style>
-          <h3 className='text-xs uppercase text-white/50 font-semibold mb-3'>All Chats</h3>
+          <h3 className='sticky top-0 z-10 bg-[#1a1a2e] text-xs uppercase text-white/50 font-semibold mb-3 pt-3 pb-2 border-b border-white/10'>All Chats</h3>
           <div className='space-y-1 no-scrollbar'>
             {Object.values(chats)
               .sort((a, b) => new Date(b.lastUpdated) - new Date(a.lastUpdated))
@@ -238,7 +250,7 @@ const Dashboard = () => {
       </aside>
 
       {/* Main Content - Offset by sidebar */}
-      <section className='flex-1 md:ml-64 flex flex-col'>
+      <section className={`flex-1 ${isSidebarOpen ? 'md:ml-64' : ''} flex flex-col`}>
         {showGreeting ? (
           // Greeting Screen
           <div className='flex-1 flex flex-col items-center justify-center px-4 py-8'>
@@ -392,7 +404,7 @@ const Dashboard = () => {
             </div>
 
             {/* Input Footer */}
-            <div className='fixed bottom-0 left-0 md:left-64 right-0 z-50 border-t border-white/10 bg-linear-to-t from-[#0f0f1e] to-[#0f0f1e]/80 px-6 py-4'>
+            <div className={`fixed bottom-0 left-0 ${isSidebarOpen ? 'md:left-64' : 'md:left-0'} right-0 z-50 border-t border-white/10 bg-linear-to-t from-[#0f0f1e] to-[#0f0f1e]/80 px-6 py-4`}>
               <form onSubmit={handleSubmitMessage} className='max-w-3xl mx-auto'>
                 {/* Attached Files Display */}
                 {attachedFiles.length > 0 && (
