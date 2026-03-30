@@ -2,6 +2,10 @@
 
 **Inquira AI** is a full-stack AI-powered chat application inspired by ChatGPT, designed to provide a smooth, real-time conversational experience with streaming responses and modern UI.
 
+## 📸 Application Preview
+
+![Inquira AI Dashboard](assets/UI.png)
+
 ---
 
 ## 🌟 Features
