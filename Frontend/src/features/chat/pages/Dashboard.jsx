@@ -5,6 +5,8 @@ import { useChat } from '../hooks/useChat'
 import { useAuth } from '../../../features/auth/hook/useAuth'
 import { useNavigate } from 'react-router'
 import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
+import 'highlight.js/styles/github-dark.css'
 import { Plus, Home, Zap, Compass, BookOpen, History, MessageSquare, Lightbulb, Paperclip, LogOut, Trash2, Menu, ChevronLeft, ChevronRight } from 'lucide-react'
 
 
@@ -385,14 +387,34 @@ const Dashboard = () => {
                       </div>
                     ) : (
                       <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[[rehypeHighlight, { ignoreMissing: true }]]}
                         components={{
                           p: ({ children }) => <p className='mb-2 last:mb-0'>{children}</p>,
                           ul: ({ children }) => <ul className='mb-2 list-disc pl-5'>{children}</ul>,
                           ol: ({ children }) => <ol className='mb-2 list-decimal pl-5'>{children}</ol>,
-                          code: ({ children }) => <code className='rounded bg-white/10 px-1 py-0.5 text-sm'>{children}</code>,
-                          pre: ({ children }) => <pre className='mb-2 overflow-x-auto rounded-xl bg-black/30 p-3 text-xs'>{children}</pre>
+                          li: ({ children }) => <li className='mt-1'>{children}</li>,
+                          a: ({ href, children }) => (
+                            <a href={href} className='text-orange-300 underline hover:text-orange-200' target='_blank' rel='noreferrer'>
+                              {children}
+                            </a>
+                          ),
+                          code: ({ inline, className, children, ...props }) => {
+                            const textClass = inline
+                              ? 'rounded bg-white/10 px-1 py-0.5 text-sm'
+                              : 'block w-full overflow-x-auto rounded-xl bg-[#111827] p-3 text-xs font-mono';
+                            return (
+                              <code className={`${textClass} ${className ?? ''}`} {...props}>
+                                {children}
+                              </code>
+                            )
+                          },
+                          pre: ({ children }) => (
+                            <pre className='mb-4 overflow-x-auto rounded-2xl bg-[#111827] p-3 text-xs'>
+                              {children}
+                            </pre>
+                          )
                         }}
-                        remarkPlugins={[remarkGfm]}
                       >
                         {message.content}
                       </ReactMarkdown>
