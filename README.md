@@ -521,7 +521,7 @@ Ensure you have the following installed:
    PORT=8000
    
    # Database
-   MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/inquira-ai
+   MONGODB_URI=your_mongoDb_uri_here
    
    # AI Model APIs
    GEMINI_API_KEY=your_google_gemini_api_key_here
